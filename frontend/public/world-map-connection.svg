@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" fill="none">
+  <style>
+    .route { stroke-dasharray: 7 8; animation: travel 1.3s linear infinite; }
+    .route-yellow { animation-delay: .18s; }
+    .route-red { animation-delay: .36s; }
+    .map-node { transform-box: fill-box; transform-origin: center; animation: pulse 1.7s ease-in-out infinite; }
+    .map-node-delay { animation-delay: .25s; }
+    .map-node-delay-two { animation-delay: .55s; }
+    .map-node-delay-three { animation-delay: .8s; }
+    @keyframes travel { to { stroke-dashoffset: -30; } }
+    @keyframes pulse { 50% { opacity: .42; transform: scale(.72); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+  </style>
+  <g fill="#1e4650" stroke="#3b7780" stroke-opacity=".3" stroke-width="2">
+    <path d="m92 114 35-31 55 4 31 27 46 8 18 30-16 22-45-4-22 26-31-7-13-25-32-1-11-25-36-3-14-21 35 0Zm151 93 31 12 17 32-13 36-19-12-9-31-24-16 17-21Zm76 53 33 14 17 40 22 49-18 61-24 43-18-25 5-36-19-31 1-45-20-39 21-31Zm89-131 45-23 33 14 19-15 42 10 23-9 35 17 35-5 35 20 51-4 37 23 31-7 30 27-10 24-43 3-17 22-35-10-18 16-31-7-18 18-31-6-14-21-24 7-22-19-31 12-18-13-26 8-16-14-25 9-18-16-25 5-8-22-30 1-5-24-25-5-1-19-28 0-20-20 17-15Zm93 97 40 8 25 30 15 37-16 41-24 19-7 35-26 30-18-28-3-40-16-36 7-36-20-29 19-31 24 0Zm180 109 34-16 32 17 21 38-17 32-30 8-24-26-25-17 9-36Zm-10-99 27-13 34 10 17 22-18 12-34-8-26-23Zm174-36 23-11 28 13 9 26-20 10-27-14-13-24Z"/>
+  </g>
+  <g stroke-width="2.5" stroke-linecap="round">
+    <path class="route route-green" d="M510 311C442 190 326 177 235 199" stroke="#22a447"/>
+    <path class="route route-yellow" d="M510 311C566 185 675 166 774 192" stroke="#f3d33b"/>
+    <path class="route route-red" d="M510 311C624 291 725 329 821 365" stroke="#e3464c"/>
+  </g>
+  <g>
+    <circle class="map-node" cx="510" cy="311" r="8" fill="#f3d33b"/>
+    <circle class="map-node map-node-delay" cx="235" cy="199" r="5" fill="#22a447"/>
+    <circle class="map-node map-node-delay-two" cx="774" cy="192" r="5" fill="#f3d33b"/>
+    <circle class="map-node map-node-delay-three" cx="821" cy="365" r="5" fill="#e3464c"/>
+  </g>
+</svg>
