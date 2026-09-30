@@ -10,6 +10,15 @@ import { BrowserRouter } from "react-router";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations
+      .filter((registration) => [registration.active, registration.waiting, registration.installing]
+        .some((worker) => worker && new URL(worker.scriptURL).pathname === "/service-worker.js"))
+      .forEach((registration) => registration.unregister());
+  }).catch(() => {});
+}
+
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(

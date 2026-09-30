@@ -40,3 +40,19 @@ cd frontend
 **Wog--chat**
 A MERN stack realtime chat app about language exchange worldwide/
 *d2e1724a1b6bdcc6a6349cfd7b0351c79bbf1bc9*
+
+## Local development
+
+Start MongoDB separately (local MongoDB or MongoDB Atlas), then configure `backend/.env` with `MONGO_URI`, Stream credentials, Google client ID, and `JWT_SECRET_KEY`.
+
+Run the backend and frontend in separate terminals:
+
+```bash
+cd backend && npm install && npm run dev
+```
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+The Notifications page shows friend requests and connection updates.
