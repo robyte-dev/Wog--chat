@@ -23,7 +23,8 @@ export function createAuthSession(res, user, status = 200) {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.COOKIE_SECURE === "true" ||
+      (process.env.COOKIE_SECURE !== "false" && process.env.NODE_ENV === "production"),
   });
 
   const safeUser = user.toObject ? user.toObject() : { ...user };

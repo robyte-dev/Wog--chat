@@ -14,7 +14,6 @@ const Navbar = ({ onSidebarToggle, showSidebar }) => {
   const isChatPage = location.pathname?.startsWith("/chat");
   const { logoutMutation } = useLogout();
   const [confirmLogout, setConfirmLogout] = useState(false);
-
   return (
     <nav className="navbar-shell sticky top-0 z-30 h-16 px-3 sm:px-6">
       <div className="flex items-center w-full gap-3">
@@ -42,9 +41,8 @@ const Navbar = ({ onSidebarToggle, showSidebar }) => {
         )}
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <Link to="/notifications" className="btn btn-ghost btn-circle relative">
+          <Link to="/notifications" className="btn btn-ghost btn-circle relative" aria-label="Notifications">
             <BellIcon className="h-5 w-5 text-base-content opacity-80" />
-            <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-primary shadow-sm" />
           </Link>
 
           <ThemeSelector />
