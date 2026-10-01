@@ -19,7 +19,9 @@ async function ensureConnected(client, user, token) {
     await streamConnectionPromise.catch(() => {});
   }
 
-  if (client.userID === userId) return;
+  if (client.userID === userId) {
+    return;
+  }
   if (client.userID) await client.disconnectUser();
 
   streamConnectionUserId = userId;

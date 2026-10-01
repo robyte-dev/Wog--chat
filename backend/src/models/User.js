@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
+    tokenVersion: {
+      type: Number,
+      default: 0,
+    },
     bio: {
       type: String,
       default: "",
@@ -34,10 +38,6 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
     nativeLanguage: {
-      type: String,
-      default: "",
-    },
-    learningLanguage: {
       type: String,
       default: "",
     },

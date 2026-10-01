@@ -2,8 +2,11 @@ import User from "../models/User.js";
 import FriendRequest from "../models/FriendRequest.js";
 import { syncStreamUser } from "../lib/authSession.js";
 import { deleteStreamUser } from "../lib/stream.js";
+import PasswordResetCode from "../models/PasswordResetCode.js";
+import AuthSession from "../models/AuthSession.js";
+import TrustedDevice from "../models/TrustedDevice.js";
 
-const profileFields = ["fullName", "bio", "profilePic", "nativeLanguage", "learningLanguage", "location"];
+const profileFields = ["fullName", "bio", "profilePic", "nativeLanguage", "location"];
 
 export async function updateProfile(req, res) {
   try {
@@ -38,9 +41,13 @@ export async function deleteAccount(req, res) {
     await Promise.all([
       User.updateMany({ friends: userId }, { $pull: { friends: userId } }),
       FriendRequest.deleteMany({ $or: [{ sender: userId }, { recipient: userId }] }),
+      PasswordResetCode.deleteMany({ user: userId }),
+      AuthSession.deleteMany({ user: userId }),
+      TrustedDevice.deleteMany({ user: userId }),
     ]);
     await User.findByIdAndDelete(userId);
     res.clearCookie("jwt");
+    res.clearCookie("wog_device", { httpOnly: true, secure: process.env.COOKIE_SECURE === "true" || (process.env.COOKIE_SECURE !== "false" && process.env.NODE_ENV === "production"), sameSite: "strict", path: "/" });
     return res.status(200).json({ success: true, message: "Your account and associated chat data were deleted." });
   } catch (error) {
     console.error("Account deletion failed:", error.message);
@@ -59,7 +66,7 @@ export async function getRecommendedUsers(req, res) {
         { _id: { $nin: currentUser.friends } }, // exclude current user's friends
         { isOnboarded: true },
       ],
-    }).select("fullName profilePic nativeLanguage learningLanguage location bio");
+    }).select("fullName profilePic nativeLanguage location bio");
     res.status(200).json(recommendedUsers);
   } catch (error) {
     console.error("Error in getRecommendedUsers controller", error.message);
@@ -71,7 +78,7 @@ export async function getMyFriends(req, res) {
   try {
     const user = await User.findById(req.user.id)
       .select("friends")
-      .populate("friends", "fullName profilePic nativeLanguage learningLanguage");
+      .populate("friends", "fullName profilePic nativeLanguage");
 
     res.status(200).json(user.friends);
   } catch (error) {
@@ -206,7 +213,7 @@ export async function getFriendRequests(req, res) {
     const incomingReqs = await FriendRequest.find({
       recipient: req.user.id,
       status: "pending",
-    }).populate("sender", "fullName profilePic nativeLanguage learningLanguage bio location");
+    }).populate("sender", "fullName profilePic nativeLanguage bio location");
 
     const acceptedReqs = await FriendRequest.find({
       sender: req.user.id,
@@ -230,7 +237,7 @@ export async function getOutgoingFriendReqs(req, res) {
     const outgoingRequests = await FriendRequest.find({
       sender: req.user.id,
       status: "pending",
-    }).populate("recipient", "fullName profilePic nativeLanguage learningLanguage");
+    }).populate("recipient", "fullName profilePic nativeLanguage");
 
     res.status(200).json(outgoingRequests);
   } catch (error) {

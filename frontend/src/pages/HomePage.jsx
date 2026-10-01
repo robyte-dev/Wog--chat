@@ -63,7 +63,7 @@ const HomePage = () => {
     const term = search.trim().toLowerCase();
     if (!term) return recommendedUsers;
     return recommendedUsers.filter((user) =>
-      [user.fullName, user.location, user.nativeLanguage, user.learningLanguage, user.bio]
+      [user.fullName, user.location, user.nativeLanguage, user.bio]
         .filter(Boolean)
     .some((value) => String(value).toLowerCase().includes(term)),
     );
@@ -192,11 +192,6 @@ const HomePage = () => {
                       {user.nativeLanguage && (
                         <span className="learner-language learner-language-native">
                           <LanguageFlag language={user.nativeLanguage} /><span><small>{t("home.speaks")}</small>{capitialize(user.nativeLanguage)}</span>
-                        </span>
-                      )}
-                      {user.learningLanguage && (
-                        <span className="learner-language learner-language-learning">
-                          <LanguageFlag language={user.learningLanguage} /><span><small>{t("home.learning")}</small>{capitialize(user.learningLanguage)}</span>
                         </span>
                       )}
                     </div>

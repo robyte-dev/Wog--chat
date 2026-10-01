@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import { createAuthSession, syncStreamUser } from "../lib/authSession.js";
+import { beginVerifiedLogin, endCurrentSession } from "../lib/deviceAuth.js";
 
 export async function signup(req, res) {
   const { password, fullName } = req.body;
@@ -36,7 +37,7 @@ export async function signup(req, res) {
     });
 
     await syncStreamUser(newUser);
-    return createAuthSession(res, newUser, 201);
+    return await createAuthSession(req, res, newUser, 201, true);
   } catch (error) {
     console.log("Error in signup controller", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -58,32 +59,32 @@ export async function login(req, res) {
     const isPasswordCorrect = await user.matchPassword(password);
     if (!isPasswordCorrect) return res.status(401).json({ message: "Invalid email or password" });
 
-    return createAuthSession(res, user);
+    return await beginVerifiedLogin(req, res, user);
   } catch (error) {
     console.log("Error in login controller", error.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(error.status || (error.code === "EMAIL_NOT_CONFIGURED" ? 503 : 500)).json({
+      message: error.code === "EMAIL_NOT_CONFIGURED" ? "Email verification is not configured yet. Please contact support." : error.message || "Internal Server Error",
+    });
   }
 }
 
-export function logout(req, res) {
-  res.clearCookie("jwt");
-  res.status(200).json({ success: true, message: "Logout successful" });
+export async function logout(req, res) {
+  return endCurrentSession(req, res);
 }
 
 export async function onboard(req, res) {
   try {
     const userId = req.user._id;
 
-    const { fullName, bio, nativeLanguage, learningLanguage, location } = req.body;
+    const { fullName, bio, nativeLanguage, location } = req.body;
 
-    if (!fullName || !bio || !nativeLanguage || !learningLanguage || !location) {
+    if (!fullName || !bio || !nativeLanguage || !location) {
       return res.status(400).json({
         message: "All fields are required",
         missingFields: [
           !fullName && "fullName",
           !bio && "bio",
           !nativeLanguage && "nativeLanguage",
-          !learningLanguage && "learningLanguage",
           !location && "location",
         ].filter(Boolean),
       });
@@ -92,7 +93,11 @@ export async function onboard(req, res) {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
-        ...req.body,
+        fullName: fullName.trim(),
+        bio: bio.trim(),
+        nativeLanguage,
+        location: location.trim(),
+        ...(typeof req.body.profilePic === "string" ? { profilePic: req.body.profilePic } : {}),
         isOnboarded: true,
       },
       { new: true }

@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import User from "../models/User.js";
 import { createAuthSession, syncStreamUser } from "../lib/authSession.js";
+import { beginVerifiedLogin } from "../lib/deviceAuth.js";
 import { verifyGoogleIdToken } from "../lib/googleIdentity.js";
 
 const isDuplicateKeyError = (error) => error?.code === 11000;
@@ -26,6 +27,7 @@ export async function googleAuth(req, res) {
   try {
     let user = await User.findOne({ googleId: identity.googleId });
     let shouldSyncStream = false;
+    let isNewAccount = false;
 
     if (!user) {
       const emailAccount = await User.findOne({ email: identity.email });
@@ -63,16 +65,20 @@ export async function googleAuth(req, res) {
           password: randomBytes(48).toString("base64url"),
         });
         shouldSyncStream = true;
+        isNewAccount = true;
       }
     }
 
     if (shouldSyncStream) await syncStreamUser(user);
-    return createAuthSession(res, user);
+    if (isNewAccount) return await createAuthSession(req, res, user, 200, true);
+    return await beginVerifiedLogin(req, res, user);
   } catch (error) {
     if (isDuplicateKeyError(error)) {
       return res.status(409).json({ message: "This Google account is already linked to another profile." });
     }
     console.error("Google sign-in failed:", error);
-    return res.status(500).json({ message: "Could not finish Google sign-in. Please try again." });
+    return res.status(error.status || (error.code === "EMAIL_NOT_CONFIGURED" ? 503 : 500)).json({
+      message: error.code === "EMAIL_NOT_CONFIGURED" ? "Email verification is not configured yet. Please contact support." : "Could not finish Google sign-in. Please try again.",
+    });
   }
 }
