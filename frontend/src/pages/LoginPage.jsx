@@ -6,6 +6,7 @@ import AuthSideNav from "../components/AuthSideNav";
 import LanguageSelector from "../features/language/LanguageSelector";
 import { useLanguage } from "../features/language/useLanguage";
 import GoogleSignInButton from "../features/google-auth/GoogleSignInButton";
+import DeviceVerification from "../features/sessions/DeviceVerification";
 
 const LoginPage = () => {
   const { t } = useLanguage();
@@ -13,12 +14,13 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
+  const [verificationEmail, setVerificationEmail] = useState("");
 
   const { isPending, error, loginMutation } = useLogin();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    loginMutation(loginData);
+    loginMutation(loginData, { onSuccess: (result) => result?.requiresVerification && setVerificationEmail(result.email) });
   };
 
   return (
@@ -36,6 +38,9 @@ const LoginPage = () => {
             </span>
           </div>
 
+          {verificationEmail ? (
+            <DeviceVerification email={verificationEmail} onCancel={() => setVerificationEmail("")} />
+          ) : <>
           {error && (
             <div className="alert alert-error mb-4 rounded-2xl">
               <span>{error.response?.data?.message || "Unable to sign in."}</span>
@@ -75,6 +80,11 @@ const LoginPage = () => {
                 />
                 <label htmlFor="login-password">{t("auth.password")}</label>
               </div>
+              <div className="-mt-2 flex justify-end">
+                <Link to="/forgot-password" className="text-sm font-medium text-primary transition-colors hover:text-secondary hover:underline">
+                  {t("passwordReset.link")}
+                </Link>
+              </div>
             </div>
 
             <button type="submit" className="auth-cta btn btn-primary" disabled={isPending}>
@@ -91,7 +101,7 @@ const LoginPage = () => {
               )}
             </button>
 
-            <GoogleSignInButton />
+            <GoogleSignInButton onVerificationRequired={setVerificationEmail} />
 
             <div className="text-center pt-1">
               <p className="text-sm text-base-content/70">
@@ -102,6 +112,7 @@ const LoginPage = () => {
               </p>
             </div>
           </form>
+          </>}
         </div>
 
         <div className="auth-visual-column flex items-center justify-center">

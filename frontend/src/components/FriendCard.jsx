@@ -21,10 +21,6 @@ const FriendCard = ({ friend }) => {
             <LanguageFlag language={friend.nativeLanguage} />
             {t("friends.native")}: {friend.nativeLanguage}
           </span>
-          <span className="badge badge-outline text-xs">
-            <LanguageFlag language={friend.learningLanguage} />
-            {t("friends.learning")}: {friend.learningLanguage}
-          </span>
         </div>
 
         <Link to={`/chat/${friend._id}`} className="btn btn-outline w-full">

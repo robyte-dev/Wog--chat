@@ -9,6 +9,31 @@ export const login = async (loginData) => {
   const response = await axiosInstance.post("/auth/login", loginData);
   return response.data;
 };
+
+export const verifyNewDevice = async ({ email, code }) => {
+  const response = await axiosInstance.post("/auth/login/verify-device", { email, code });
+  return response.data;
+};
+
+export const getActiveSessions = async () => (await axiosInstance.get("/auth/sessions")).data;
+export const terminateSession = async (sessionId) => (await axiosInstance.delete(`/auth/sessions/${encodeURIComponent(sessionId)}`)).data;
+export const terminateOtherSessions = async () => (await axiosInstance.delete("/auth/sessions/others")).data;
+
+export const requestPasswordReset = async (email) => {
+  const response = await axiosInstance.post("/auth/password-reset/request", { email });
+  return response.data;
+};
+
+export const verifyPasswordResetCode = async ({ email, code }) => {
+  const response = await axiosInstance.post("/auth/password-reset/verify", { email, code });
+  return response.data;
+};
+
+export const completePasswordReset = async ({ resetToken, password }) => {
+  const response = await axiosInstance.post("/auth/password-reset/complete", { resetToken, password });
+  return response.data;
+};
+
 export const googleAuth = async ({ credential, nonce }) => {
   const response = await axiosInstance.post("/auth/google", { credential, nonce });
   return response.data;

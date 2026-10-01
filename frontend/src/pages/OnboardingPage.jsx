@@ -18,7 +18,6 @@ const OnboardingPage = () => {
     fullName: authUser?.fullName || "",
     bio: authUser?.bio || "",
     nativeLanguage: authUser?.nativeLanguage || "",
-    learningLanguage: authUser?.learningLanguage || "",
     location: authUser?.location || "",
     profilePic: authUser?.profilePic?.startsWith("http") ? authUser.fullName : authUser?.profilePic || authUser?.fullName || Math.random().toString(36).substring(7),
   });
@@ -99,14 +98,13 @@ const OnboardingPage = () => {
                     />
                     <label htmlFor="onboarding-name">{t("auth.fullName")}</label>
                   </div>
-
                   <div className="form-floating onboarding-bio-field">
                     <textarea
                       id="onboarding-bio"
                       name="bio"
                       value={formState.bio}
                       onChange={(e) => setFormState({ ...formState, bio: e.target.value })}
-                      placeholder="Tell others about yourself and your language learning goals"
+                      placeholder="Tell others about yourself"
                       required
                     />
                     <label htmlFor="onboarding-bio">{t("onboarding.bio")}</label>
@@ -130,22 +128,6 @@ const OnboardingPage = () => {
                       <label htmlFor="native-language">{t("onboarding.nativeLanguage")}</label>
                     </div>
 
-                    <div className="form-floating">
-                      <select
-                        id="learning-language"
-                        className="language-choice"
-                        name="learningLanguage"
-                        value={formState.learningLanguage}
-                        onChange={(e) => setFormState({ ...formState, learningLanguage: e.target.value })}
-                        required
-                      >
-                        <option value="" disabled hidden></option>
-                        {LANGUAGES.map((lang) => (
-                          <option key={`learning-${lang}`} value={lang.toLowerCase()}>{lang}</option>
-                        ))}
-                      </select>
-                      <label htmlFor="learning-language">{t("onboarding.learningLanguage")}</label>
-                    </div>
                   </div>
 
                   <div className="form-floating">

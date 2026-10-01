@@ -5,7 +5,7 @@ import { useLanguage } from "../language/useLanguage";
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-const GoogleSignInButton = () => {
+const GoogleSignInButton = ({ onVerificationRequired }) => {
   const buttonRef = useRef(null);
   const { t } = useLanguage();
   const { mutate, isPending, error } = useGoogleAuth();
@@ -29,7 +29,9 @@ const GoogleSignInButton = () => {
           client_id: GOOGLE_CLIENT_ID,
           nonce,
           callback: (response) => {
-            if (response?.credential) mutate({ credential: response.credential, nonce });
+            if (response?.credential) mutate({ credential: response.credential, nonce }, {
+              onSuccess: (result) => result?.requiresVerification && onVerificationRequired?.(result.email),
+            });
             else setWidgetError(t("auth.googleTryAgain"));
           },
           auto_select: false,
@@ -56,7 +58,7 @@ const GoogleSignInButton = () => {
       cancelled = true;
       buttonElement?.replaceChildren();
     };
-  }, [mutate, t]);
+  }, [mutate, onVerificationRequired, t]);
 
   const errorMessage = error?.response?.data?.message || widgetError;
 
